@@ -1,8 +1,10 @@
-;;;; significant-other.el --- Helper functions to help you jump to significant other files -*- lexical-binding: t -*-
+;;; significant-other.el --- Helper functions to help you jump to significant other files -*- lexical-binding: t -*-
 
 ;; Version: 1.0.0
-;; Author: Ovi Stoica <ovidiu.stoica1094@gmail.com>
-;; Url: https://github.com/ovistoica/significant-other.el
+;; Author: Magnars Sven
+;; Maintainer: Ovi Stoica <ovidiu.stoica1094@gmail.com>
+;; URL: https://github.com/ovistoica/significant-other.el
+;; Package-Requires: ((emacs "24.3") (dash "2.12.0"))
 ;; Keywords: convenience, project, testing
 
 ;; This file is NOT part of GNU Emacs.
@@ -40,17 +42,24 @@
 
 (require 'dash)
 
-(defgroup significant-other)
+(defgroup significant-other nil
+  "Helper functions to jump to significant other files."
+  :group 'convenience
+  :prefix "significant-other-")
 
-(setq significant-other-find-fn
-      (lambda ()
-        (message "Significant other not configured for this mode.")
-        nil))
+(defvar significant-other-find-fn
+  (lambda ()
+    (message "Significant other not configured for this mode.")
+    nil)
+  "Function to find significant other files for the current buffer.
+Should return a list of file paths that are considered significant others.")
 
 (defun significant-other-find-existing ()
+  "Find the first existing significant other file for the current buffer."
   (-first 'file-exists-p (funcall significant-other-find-fn)))
 
 (defun significant-other-find-all-existing ()
+  "Find all existing significant other files for the current buffer."
   (-filter 'file-exists-p (funcall significant-other-find-fn)))
 
 (defun significant-other-find-tests ()
@@ -60,7 +69,11 @@
                   (string-match-p "/test/.+\\.clj" file)))
            (funcall significant-other-find-fn)))
 
+;;;###autoload
 (defun significant-other-jump (arg)
+  "Jump to a significant other file for the current buffer.
+With prefix ARG, create the file if it doesn't exist.
+If multiple significant others exist, prompt to choose one."
   (interactive "P")
   (let ((existing-files (significant-other-find-all-existing)))
     (cond
@@ -80,6 +93,11 @@
           (ido-find-file-in-dir (file-name-directory file))))))))
 
 (defmacro with-significant-others (binding &rest mappings)
+  "Configure significant other file mappings for the current buffer.
+BINDING is the variable name to bind the current file path to.
+MAPPINGS is a list of (REGEX PATHS-EXPR) pairs where:
+- REGEX matches against the current file path
+- PATHS-EXPR evaluates to a list of significant other file paths"
   (declare (indent 1))
   `(setq-local
     significant-other-find-fn
@@ -91,6 +109,6 @@
               ,(cadr it))
             mappings))))))
 
-(global-set-key (kbd "s-j") 'significant-other-jump)
-
 (provide 'significant-other)
+
+;;; significant-other.el ends here
