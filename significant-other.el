@@ -52,6 +52,14 @@
   :type 'string
   :group 'significant-other)
 
+(defcustom significant-other-multiple-file-behavior 'prompt
+  "Behavior when multiple significant other files exist.
+- 'prompt: Use completing-read to let user choose (default)
+- 'first: Jump to the first file in the list automatically"
+  :type '(choice (const :tag "Prompt user to choose" prompt)
+                 (const :tag "Jump to first file" first))
+  :group 'significant-other)
+
 (defvar significant-other-find-fn
   (lambda ()
     (message "Significant other not configured for this mode.")
@@ -78,7 +86,8 @@ Should return a list of file paths that are considered significant others.")
 (defun significant-other-jump (arg)
   "Jump to a significant other file for the current buffer.
 With prefix ARG, create the file if it doesn't exist.
-If multiple significant others exist, prompt to choose one."
+If multiple significant others exist, behavior depends on
+`significant-other-multiple-file-behavior'."
   (interactive "P")
   (let ((existing-files (significant-other-find-all-existing)))
     (cond
@@ -86,10 +95,12 @@ If multiple significant others exist, prompt to choose one."
       ;; Only one file exists, jump to it
       (find-file (car existing-files)))
      ((> (length existing-files) 1)
-      ;; Multiple files exist, let user choose
-      (let ((file (completing-read "Choose significant other: "
-                                   existing-files nil t)))
-        (find-file file)))
+      ;; Multiple files exist, behavior depends on customization
+      (if (eq significant-other-multiple-file-behavior 'first)
+          (find-file (car existing-files))
+        (let ((file (completing-read "Choose significant other: "
+                                     existing-files nil t)))
+          (find-file file))))
      (t
       ;; No existing files, offer to create one
       (when-let (file (car (funcall significant-other-find-fn)))
