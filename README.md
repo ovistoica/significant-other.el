@@ -2,6 +2,23 @@
 
 Helper functions to jump between significant other files in Emacs.
 
+![Demo](demo.gif)
+
+This demo shows jumping between significant other files. The package helps you navigate between related files like:
+
+```
+shipclojure-datom/
+├── portfolio/saas/ui/pages/
+│   └── login_scenes.cljs ←→  src/cljc/saas/ui/pages/login.cljc
+│                         ←→  test/cljc/saas/ui/pages/login_test.cljc
+├── src/cljc/saas/ui/pages/
+│   └── login.cljc        ←→  test/cljc/saas/ui/pages/login_test.cljc
+│                         ←→  portfolio/saas/ui/pages/login_scenes.cljs
+└── test/cljc/saas/ui/pages/
+    └── login_test.cljc   ←→  src/cljc/saas/ui/pages/login.cljc
+                          ←→  portfolio/saas/ui/pages/login_scenes.cljs
+```
+
 Many files come in pairs, like tests and source files, header files and implementations, components and their devcards. This package helps you set up functions to jump between these related files.
 
 ## Installation
