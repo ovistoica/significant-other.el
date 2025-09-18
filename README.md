@@ -125,6 +125,28 @@ Use the `with-significant-others` macro to configure file mappings in mode hooks
        (list (replace-regexp-in-string "\\.c$" ".h" file))))))
 ```
 
+## Customization
+
+### Multiple File Behavior
+
+When multiple significant other files exist, you can customize the behavior:
+
+```elisp
+;; Prompt user to choose (default)
+(setq significant-other-multiple-file-behavior 'prompt)
+
+;; Jump to first file automatically
+(setq significant-other-multiple-file-behavior 'first)
+```
+
+### Test File Detection
+
+Customize the regex pattern for identifying test files:
+
+```elisp
+(setq significant-other-test-file-regex "/test/.+\\.spec\\.js")
+```
+
 ## Functions
 
 - `significant-other-jump` - Interactive function to jump to significant other files
