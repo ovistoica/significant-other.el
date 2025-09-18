@@ -2,23 +2,6 @@
 
 Helper functions to jump between significant other files in Emacs.
 
-![Demo](demo.gif)
-
-This demo shows jumping between significant other files. The package helps you navigate between related files like:
-
-```
-shipclojure-datom/
-├── portfolio/saas/ui/pages/
-│   └── login_scenes.cljs ←→  src/cljc/saas/ui/pages/login.cljc
-│                         ←→  test/cljc/saas/ui/pages/login_test.cljc
-├── src/cljc/saas/ui/pages/
-│   └── login.cljc        ←→  test/cljc/saas/ui/pages/login_test.cljc
-│                         ←→  portfolio/saas/ui/pages/login_scenes.cljs
-└── test/cljc/saas/ui/pages/
-    └── login_test.cljc   ←→  src/cljc/saas/ui/pages/login.cljc
-                          ←→  portfolio/saas/ui/pages/login_scenes.cljs
-```
-
 Many files come in pairs, like tests and source files, header files and implementations, components and their devcards. This package helps you set up functions to jump between these related files.
 
 ## Installation
@@ -56,6 +39,25 @@ Clone this repository and add it to your load path:
 (require 'significant-other)
 ```
 
+## Demo
+
+![Demo](demo.gif)
+
+This demo shows jumping between significant other files. The package helps you navigate between related files like:
+
+```
+shipclojure-datom/
+├── portfolio/saas/ui/pages/
+│   └── login_scenes.cljs ←→  src/cljc/saas/ui/pages/login.cljc
+│                         ←→  test/cljc/saas/ui/pages/login_test.cljc
+├── src/cljc/saas/ui/pages/
+│   └── login.cljc        ←→  test/cljc/saas/ui/pages/login_test.cljc
+│                         ←→  portfolio/saas/ui/pages/login_scenes.cljs
+└── test/cljc/saas/ui/pages/
+    └── login_test.cljc   ←→  src/cljc/saas/ui/pages/login.cljc
+                          ←→  portfolio/saas/ui/pages/login_scenes.cljs
+```
+
 ## Usage
 
 The main function is `significant-other-jump` which:
@@ -66,20 +68,28 @@ The main function is `significant-other-jump` which:
 
 ### Configuration
 
-Use the `with-significant-others` macro to configure file mappings in mode hooks:
+Use the `with-significant-others` macro to configure file mappings in mode hooks. Here's the configuration used in the demo:
 
 ```elisp
 (add-hook 'clojure-mode-hook
   (lambda ()
     (with-significant-others file
-      ;; Jump between source and test files
-      ("/src/.+\\.clj$"
-       (list (replace-regexp-in-string "/src/" "/test/" file)
-             (replace-regexp-in-string "\\.clj$" "_test.clj" file)))
+      ;; Source files to test and portfolio
+      ("/src/cljc/.+\\.cljc$"
+       (list (replace-regexp-in-string "/src/cljc/" "/test/cljc/"
+               (replace-regexp-in-string "\\.cljc$" "_test.cljc" file))
+             (replace-regexp-in-string "/src/cljc/" "/portfolio/"
+               (replace-regexp-in-string "\\.cljc$" "_scenes.cljs" file))))
 
-      ("/test/.+_test\\.clj$"
-       (list (replace-regexp-in-string "/test/" "/src/" file)
-             (replace-regexp-in-string "_test\\.clj$" ".clj" file))))))
+      ;; Test files back to source
+      ("/test/cljc/.+_test\\.cljc$"
+       (list (replace-regexp-in-string "/test/cljc/" "/src/cljc/"
+               (replace-regexp-in-string "_test\\.cljc$" ".cljc" file))))
+
+      ;; Portfolio files back to source
+      ("/portfolio/.+_scenes\\.cljs$"
+       (list (replace-regexp-in-string "/portfolio/" "/src/cljc/"
+               (replace-regexp-in-string "_scenes\\.cljs$" ".cljc" file)))))))
 ```
 
 ### Example Configurations
