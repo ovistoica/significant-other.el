@@ -4,7 +4,7 @@
 ;; Author: Magnars Sven
 ;; Maintainer: Ovi Stoica <ovidiu.stoica1094@gmail.com>
 ;; URL: https://github.com/ovistoica/significant-other.el
-;; Package-Requires: ((emacs "24.3") (dash "2.12.0"))
+;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: convenience, project, testing
 
 ;; This file is NOT part of GNU Emacs.
@@ -40,7 +40,6 @@
 
 ;;; Code:
 
-(require 'dash)
 
 (defgroup significant-other nil
   "Helper functions to jump to significant other files."
@@ -69,18 +68,18 @@ Should return a list of file paths that are considered significant others.")
 
 (defun significant-other-find-existing ()
   "Find the first existing significant other file for the current buffer."
-  (-first 'file-exists-p (funcall significant-other-find-fn)))
+  (seq-find #'file-exists-p (funcall significant-other-find-fn)))
 
 (defun significant-other-find-all-existing ()
   "Find all existing significant other files for the current buffer."
-  (-filter 'file-exists-p (funcall significant-other-find-fn)))
+  (seq-filter #'file-exists-p (funcall significant-other-find-fn)))
 
 (defun significant-other-find-tests ()
   "Find existing significant other files that are test files."
-  (-filter (lambda (file)
-             (and (file-exists-p file)
-                  (string-match-p significant-other-test-file-regex file)))
-           (funcall significant-other-find-fn)))
+  (seq-filter (lambda (file)
+                (and (file-exists-p file)
+                     (string-match-p significant-other-test-file-regex file)))
+              (funcall significant-other-find-fn)))
 
 ;;;###autoload
 (defun significant-other-jump (arg)
@@ -120,9 +119,10 @@ MAPPINGS is a list of (REGEX PATHS-EXPR) pairs where:
     (lambda ()
       (let ((,binding (buffer-file-name)))
         (cond
-         ,@(--map
-            `((string-match-p ,(car it) ,binding)
-              ,(cadr it))
+         ,@(mapcar
+            (lambda (it)
+              `((string-match-p ,(car it) ,binding)
+                ,(cadr it)))
             mappings))))))
 
 (provide 'significant-other)
