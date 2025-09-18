@@ -47,6 +47,11 @@
   :group 'convenience
   :prefix "significant-other-")
 
+(defcustom significant-other-test-file-regex "/test/.+\\.clj"
+  "Regular expression to identify test files in significant other candidates."
+  :type 'string
+  :group 'significant-other)
+
 (defvar significant-other-find-fn
   (lambda ()
     (message "Significant other not configured for this mode.")
@@ -66,7 +71,7 @@ Should return a list of file paths that are considered significant others.")
   "Find existing significant other files that are test files."
   (-filter (lambda (file)
              (and (file-exists-p file)
-                  (string-match-p "/test/.+\\.clj" file)))
+                  (string-match-p significant-other-test-file-regex file)))
            (funcall significant-other-find-fn)))
 
 ;;;###autoload

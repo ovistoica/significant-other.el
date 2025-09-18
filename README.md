@@ -14,6 +14,22 @@ Many files come in pairs, like tests and source files, header files and implemen
   :bind ("s-j" . significant-other-jump))
 ```
 
+### Straight.el
+
+With use-package:
+```elisp
+(use-package significant-other
+  :straight '(significant-other :type git :host github :repo "ovistoica/significant-other.el")
+  :bind ("s-j" . significant-other-jump))
+```
+
+Raw straight:
+```elisp
+(straight-use-package '(significant-other :type git :host github :repo "ovistoica/significant-other.el"))
+(require 'significant-other)
+(global-set-key (kbd "s-j") 'significant-other-jump)
+```
+
 ### Manual Installation
 
 Clone this repository and add it to your load path:
